@@ -1,11 +1,11 @@
 import numpy as np
-from sklearn.cross_validation import KFold
+from sklearn.model_selection import KFold
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 from copy import copy
 
 def get_predictions(model, X):
 	if hasattr(model, 'predict_proba'):
-		pred = model.predict_proba(X)	
+		pred = model.predict_proba(X)
 	else:
 		pred = model.predict(X)
 
@@ -13,7 +13,7 @@ def get_predictions(model, X):
 			pred = pred[:,None]
 
 	return pred
-	
+
 class StackedGeneralizer(object):
 	"""Base class for stacked generalization classifier models
 	"""
@@ -24,7 +24,7 @@ class StackedGeneralizer(object):
 
 		Trains a series of base models using K-fold cross-validation, then combines
 		the predictions of each model into a set of features that are used to train
-		a high-level classifier model. 
+		a high-level classifier model.
 
 		Parameters
 		-----------
@@ -51,7 +51,7 @@ class StackedGeneralizer(object):
 
 		VERBOSE = True
 		N_FOLDS = 5
-		
+
 		# load data and shuffle observations
 		data = load_digits()
 
@@ -75,7 +75,7 @@ class StackedGeneralizer(object):
 		blending_model = LogisticRegression()
 
 		# initialize multi-stage model
-		sg = StackedGeneralizer(base_models, blending_model, 
+		sg = StackedGeneralizer(base_models, blending_model,
 			                    n_folds=N_FOLDS, verbose=VERBOSE)
 
 		# fit model
@@ -112,7 +112,7 @@ class StackedGeneralizer(object):
 		if self.verbose:
 			print('Fitting Base Models...')
 
-		kf = list(KFold(y.shape[0], self.n_folds))
+		kf = list(KFold(n_splits= self.n_folds,shuffle=True,random_state=2017).split(X))
 
 		self.base_models_cv = {}
 
@@ -123,7 +123,7 @@ class StackedGeneralizer(object):
 				print('Fitting %s' % model_name)
 
 			# run stratified CV for each model
-			self.base_models_cv[model_name] = []			
+			self.base_models_cv[model_name] = []
 			for j, (train_idx, test_idx) in enumerate(kf):
 				if self.verbose:
 					print('Fold %d' % (j + 1))
@@ -144,10 +144,10 @@ class StackedGeneralizer(object):
 			n_models = len(self.base_models_cv[key])
 			for i, model in enumerate(self.base_models_cv[key]):
 				model_predictions = get_predictions(model, X)
-		
+
 				if cv_predictions is None:
 					cv_predictions = np.zeros((n_models, X.shape[0], model_predictions.shape[1]))
-					
+
 				cv_predictions[i,:,:] = model_predictions
 
 			# perform model averaging and add to features
@@ -166,8 +166,10 @@ class StackedGeneralizer(object):
 			model_name = "%s" % self.blending_model.__repr__()
 			print('Fitting Blending Model:\n%s' % model_name)
 
-		kf = list(KFold(y.shape[0], self.n_folds))
-		# run  CV 
+
+		kf = list(KFold(n_splits= self.n_folds,shuffle=True,random_state=2017).split(X_blend))
+        #kf = list(KFold(y.shape[0], self.n_folds))
+		# run  CV
 		self.blending_model_cv = []
 
 		for j, (train_idx, test_idx) in enumerate(kf):
@@ -195,9 +197,9 @@ class StackedGeneralizer(object):
 
 			if cv_predictions is None:
 				cv_predictions = np.zeros((n_models, X_blend.shape[0], model_predictions.shape[1]))
-			
+
 			cv_predictions[i,:,:] = model_predictions
-			
+
 		# perform model averaging to get predictions
 		predictions = cv_predictions.mean(0)
 		return predictions
@@ -214,7 +216,7 @@ class StackedGeneralizer(object):
 		self.fit_blending_model(X_blend, y)
 
 	def evaluate(self, y, y_pred):
-		print classification_report(y, y_pred)
-		print 'Confusion Matrix:'
-		print confusion_matrix(y, y_pred)
-		return accuracy_score(y, y_pred)
+		print(classification_report(y, y_pred))
+		print('Confusion Matrix:')
+		print(confusion_matrix(y, y_pred))
+		return(accuracy_score(y, y_pred))
