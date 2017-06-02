@@ -1,5 +1,5 @@
-from setuptools import setup, find_packages 
-from codecs import open  
+from setuptools import setup, find_packages
+from codecs import open
 import os
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -12,8 +12,8 @@ setup(
     packages=find_packages(),
     version='0.0.0',
     description='Python implementation of stacked generalization. Plays nicely with sklearn',
-    long_description=long_description,    
-    url='https://github.com/dustinstansbury/stacked_generalization',
+    long_description=long_description,
+    url='https://github.com/fanshuoshuo/stacked_generalization',
     author='Dustin Stansbury',
     author_email='https://dustin.stansbury@gmail.com',
     keywords='machine learning, stacked generalization, ensemble methods, classification algorithms',
