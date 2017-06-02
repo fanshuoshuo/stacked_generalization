@@ -14,8 +14,8 @@ setup(
     description='Python implementation of stacked generalization. Plays nicely with sklearn',
     long_description=long_description,
     url='https://github.com/fanshuoshuo/stacked_generalization',
-    author='Dustin Stansbury',
-    author_email='https://dustin.stansbury@gmail.com',
+    author='shuoshuoFan',
+    author_email='https://shuoshuofan@gmail.com',
     keywords='machine learning, stacked generalization, ensemble methods, classification algorithms',
 
     install_requires=['numpy>1.6.1',
